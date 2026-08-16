@@ -15,6 +15,9 @@ const openai = new OpenAI({
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use(express.static('public'));
+app.get('/', (req, res) => {
+    res.sendFile(path.join(__dirname, 'public', 'index.html'));
+});
 
 // API xử lý chính: Nhận yêu cầu, dùng AI viết cấu hình và đóng gói .zip
 app.post('/api/generate-ai-smp', async (req, res) => {
