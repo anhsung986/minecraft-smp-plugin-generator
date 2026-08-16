@@ -88,6 +88,12 @@ app.post('/api/generate-ai-smp', async (req, res) => {
     }
 });
 
-app.listen(PORT, () => {
-    console.log(`Server đang chạy tại cổng ${PORT}`);
-});
+// Chỉ chạy app.listen khi chạy ở máy local, còn trên Vercel thì export module
+if (process.env.NODE_ENV !== 'production') {
+    app.listen(PORT, () => {
+        console.log(`Server đang chạy tại cổng ${PORT}`);
+    });
+}
+
+module.exports = app;
+
