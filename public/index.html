@@ -1,0 +1,155 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI Minecraft SMP Plugin Generator</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #121216;
+            color: #ffffff;
+            margin: 0;
+            padding: 20px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+        }
+        .container {
+            background: #1e1e24;
+            padding: 30px;
+            border-radius: 12px;
+            box-shadow: 0 8px 24px rgba(0,0,0,0.6);
+            width: 100%;
+            max-width: 500px;
+            border: 1px solid #2d2d38;
+        }
+        h2 { text-align: center; color: #4ecca3; margin-top: 0; }
+        p.subtitle { text-align: center; color: #888; font-size: 14px; margin-bottom: 20px; }
+        .form-group { margin-bottom: 20px; }
+        label { display: block; margin-bottom: 8px; font-weight: bold; color: #ccc; }
+        input[type="text"], textarea {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #3d3d4d;
+            background: #121216;
+            color: #fff;
+            border-radius: 6px;
+            box-sizing: border-box;
+            font-family: inherit;
+        }
+        textarea { resize: vertical; height: 80px; }
+        .checkbox-group {
+            background: #121216;
+            padding: 15px;
+            border-radius: 6px;
+            border: 1px solid #3d3d4d;
+        }
+        .checkbox-group label {
+            font-weight: normal;
+            display: flex;
+            align-items: center;
+            margin-bottom: 10px;
+            cursor: pointer;
+            color: #ddd;
+        }
+        .checkbox-group label:last-child { margin-bottom: 0; }
+        .checkbox-group input { margin-right: 10px; transform: scale(1.2); accent-color: #4ecca3; }
+        button {
+            background-color: #4ecca3;
+            color: #121216;
+            border: none;
+            padding: 12px;
+            width: 100%;
+            font-size: 16px;
+            font-weight: bold;
+            border-radius: 6px;
+            cursor: pointer;
+            transition: 0.3s;
+        }
+        button:hover { background-color: #3db892; }
+        button:disabled { background-color: #555; cursor: not-allowed; }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <h2>SMP Plugin Generator AI</h2>
+    <p class="subtitle">Được hỗ trợ bởi AI để cấu hình tự động cho máy chủ của bạn</p>
+    
+    <form id="aiForm">
+        <div class="form-group">
+            <label for="serverName">Tên Server SMP:</label>
+            <input type="text" id="serverName" placeholder="Ví dụ: MySurvivalSMP" required>
+        </div>
+
+        <div class="form-group">
+            <label for="serverDescription">Yêu cầu / Mô tả cho AI (Tùy chọn):</label>
+            <textarea id="serverDescription" placeholder="Ví dụ: Tạo cấu hình cho server 5 người chơi, không bật bảo vệ nhà quá gắt gao..."></textarea>
+        </div>
+
+        <div class="form-group">
+            <label>Chọn các plugin cốt lõi:</label>
+            <div class="checkbox-group">
+                <label><input type="checkbox" name="plugins" value="smp-essentials" checked> EssentialsX (AI sẽ viết file config riêng)</label>
+                <label><input type="checkbox" name="plugins" value="luckperms"> LuckPerms (Phân quyền)</label>
+                <label><input type="checkbox" name="plugins" value="griefprevention"> GriefPrevention (Claim bảo vệ đất)</label>
+            </div>
+        </div>
+
+        <button type="submit" id="submitBtn">Tạo & Đóng gói Gói .zip</button>
+    </form>
+</div>
+
+<script>
+    document.getElementById('aiForm').addEventListener('submit', async (e) => {
+        e.preventDefault();
+        
+        const serverName = document.getElementById('serverName').value;
+        const serverDescription = document.getElementById('serverDescription').value;
+        const checkboxes = document.querySelectorAll('input[name="plugins"]:checked');
+        const plugins = Array.from(checkboxes).map(cb => cb.value);
+
+        const btn = document.getElementById('submitBtn');
+        btn.textContent = 'AI đang phân tích và tạo cấu hình...';
+        btn.disabled = true;
+
+        try {
+            const response = await fetch('/api/generate-ai-smp', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ serverName, serverDescription, plugins })
+            });
+
+            if (response.ok) {
+                const blob = await response.blob();
+                const url = window.URL.createObjectURL(blob);
+                const a = document.createElement('a');
+                a.href = url;
+                a.download = `SMP_Setup_${serverName.replace(/\s+/g, '_')}.zip`;
+                document.body.appendChild(a);
+                a.click();
+                a.remove();
+                
+                btn.textContent = 'Hoàn tất tải xuống!';
+                setTimeout(() => {
+                    btn.textContent = 'Tạo & Đóng gói Gói .zip';
+                    btn.disabled = false;
+                }, 3000);
+            } else {
+                alert('Có lỗi xảy ra từ máy chủ.');
+                btn.textContent = 'Tạo & Đóng gói Gói .zip';
+                btn.disabled = false;
+            }
+        } catch (error) {
+            console.error(error);
+            alert('Lỗi kết nối đến máy chủ.');
+            btn.textContent = 'Tạo & Đóng gói Gói .zip';
+            btn.disabled = false;
+        }
+    });
+</script>
+
+</body>
+</html>
