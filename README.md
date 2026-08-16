@@ -1,0 +1,1 @@
+# minecraft-smp-plugin-generator
